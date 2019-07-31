@@ -12,6 +12,8 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 public class CheatActivity extends AppCompatActivity {
+    private static final String TAG = "CheatActivity";
+    private static final String KEY_SHOWN = "shown";
     private static final String EXTRA_ANSWER_IS_TRUE = "com.davidwang.geoquiz.answer_is_true";
     private static final String EXTRA_ANSWER_SHOWN = "com.davidwang.geoquiz.answer_shown";
 
@@ -25,6 +27,13 @@ public class CheatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cheat);
+
+        if (savedInstanceState != null) {
+            mAnswerIsShown = savedInstanceState.getBoolean(KEY_SHOWN, false);
+            Intent data = new Intent();
+            data.putExtra(EXTRA_ANSWER_SHOWN, mAnswerIsShown);
+            setResult(RESULT_OK, data);
+        }
 
         // retrieve from Intent that created the activity
         mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
@@ -47,13 +56,12 @@ public class CheatActivity extends AppCompatActivity {
 
     }
 
-//    @Override
-//    public void onSaveInstanceState(Bundle savedInstanceState) {
-//        super.onSaveInstanceState(savedInstanceState);
-//        Log.i(TAG, "onSaveInstanceState");
-//        savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
-//        savedInstanceState.putBooleanArray(KEY_ARRAY, mAnsweredQuestions);
-//    }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        Log.i(TAG, "onSaveInstanceState");
+        savedInstanceState.putBoolean(KEY_SHOWN, mAnswerIsShown);
+    }
 
     // Creates Intent that can hold a boolean as an extra
     // This boolean is used to store the correct answer to a question
