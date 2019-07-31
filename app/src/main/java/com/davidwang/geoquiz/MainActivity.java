@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
-
+            mAnsweredQuestions = savedInstanceState.getBooleanArray(KEY_ARRAY).clone();
         }
 
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
-//        savedInstanceState.putBooleanArray(KEY_ARRAY, mQuestionBank);
+        savedInstanceState.putBooleanArray(KEY_ARRAY, mAnsweredQuestions);
     }
 
 
