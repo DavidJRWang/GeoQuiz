@@ -1,8 +1,8 @@
 package com.davidwang.geoquiz;
 
 public class Question {
-    private int mTextResId;
-    private boolean mAnswerTrue;
+    private int mTextResId;         // Stores resource ID for the Question's text
+    private boolean mAnswerTrue;    // Stores the correct answer to the Question
 
     public Question(int textResId, boolean answerTrue) {
         mTextResId = textResId;

@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
     private static final String KEY_ARRAY = "array";
-    private static final int REQUEST_CODE_CHEAT = 0;
+    private static final int REQUEST_CODE_CHEAT = 0;    // used for launching CheatActivity
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -110,12 +110,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    // Called when the 'next' button is pressed
+    // Updates the text in mQuestionTextView with the next question
+    //  and enables/disables the true/false buttons as necessary
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
 
-        if (mAnsweredQuestions[mCurrentIndex] == false) {
+        if (mAnsweredQuestions[mCurrentIndex] == false) {   // if the question hasn't been answered...
             mTrueButton.setEnabled(true);
             mFalseButton.setEnabled(true);
         }
@@ -125,15 +127,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void disableButtons() {
-        mTrueButton.setEnabled(false);
-        mFalseButton.setEnabled(false);
-    }
 
+    // Called when either the 'true' or the 'false' button is pressed
+    // Determines whether or not the user's answer was correct and sends the appropriate toast
+    // Sends a 'cheater' toast if the user cheated
+    // Lastly, sends a toast displaying the user's score after all questions are answered
     private void checkAnswer(boolean userPressedTrue) {
-        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
+        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue(); // saves correct answer
         int messageResId = 0;
 
+        // determines which toast to be displayed
         if (mIsCheater)
             messageResId = R.string.judgement_toast;
         else {
@@ -145,20 +148,29 @@ public class MainActivity extends AppCompatActivity {
                 messageResId = R.string.incorrect_toast;
         }
 
-        mAnsweredQuestions[mCurrentIndex] = true;
-        boolean done = true;
+        mAnsweredQuestions[mCurrentIndex] = true;   // set current question to 'answered'
+        boolean done = true;                        // default state is done, unless found otherwise
         for (int x = 0; x < mAnsweredQuestions.length; x++) {
             if (mAnsweredQuestions[x] == false)
                 done = false;
         }
+
+        // if done, then display user's score
         if (done) {
             CharSequence message = mScore + "/" + mQuestionBank.length + " correct";
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
+        // otherwise, show the normal toast
         else
             Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
     }
 
+    // Helper method
+    // Disables 'true' and 'false' buttons on being pressed
+    private void disableButtons() {
+        mTrueButton.setEnabled(false);
+        mFalseButton.setEnabled(false);
+    }
 
     // For demonstration purposes of the Activity lifecycle and debugging
     @Override
