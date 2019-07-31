@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private static final String KEY_ARRAY = "array";
     private static final int REQUEST_CODE_CHEAT = 0;
 
     private Button mTrueButton;
@@ -31,7 +32,10 @@ public class MainActivity extends AppCompatActivity {
             new Question(R.string.question_asia, true),
     };
 
+    private boolean[] mAnsweredQuestions = new boolean[mQuestionBank.length];    // all elements initialized to false
+
     private int mCurrentIndex = 0;
+    private int mScore = 0;
     private boolean mIsCheater;
 
     @Override
@@ -40,8 +44,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate(Bundle) called");
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState != null)
+        if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+
+        }
 
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
         mTrueButton = (Button) findViewById(R.id.true_button);
@@ -53,12 +59,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 checkAnswer(true);
+                disableButtons();
             }
         });
         mFalseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkAnswer(false);
+                disableButtons();
             }
         });
 
@@ -82,6 +90,14 @@ public class MainActivity extends AppCompatActivity {
         updateQuestion();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        Log.i(TAG, "onSaveInstanceState");
+        savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
+//        savedInstanceState.putBooleanArray(KEY_ARRAY, mQuestionBank);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -98,8 +114,21 @@ public class MainActivity extends AppCompatActivity {
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
+
+        if (mAnsweredQuestions[mCurrentIndex] == false) {
+            mTrueButton.setEnabled(true);
+            mFalseButton.setEnabled(true);
+        }
+        else {
+            mTrueButton.setEnabled(false);
+            mFalseButton.setEnabled(false);
+        }
     }
 
+    private void disableButtons() {
+        mTrueButton.setEnabled(false);
+        mFalseButton.setEnabled(false);
+    }
 
     private void checkAnswer(boolean userPressedTrue) {
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
@@ -108,22 +137,28 @@ public class MainActivity extends AppCompatActivity {
         if (mIsCheater)
             messageResId = R.string.judgement_toast;
         else {
-            if (userPressedTrue == answerIsTrue)
+            if (userPressedTrue == answerIsTrue) {
                 messageResId = R.string.correct_toast;
+                mScore++;
+            }
             else
                 messageResId = R.string.incorrect_toast;
         }
 
-        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+        mAnsweredQuestions[mCurrentIndex] = true;
+        boolean done = true;
+        for (int x = 0; x < mAnsweredQuestions.length; x++) {
+            if (mAnsweredQuestions[x] == false)
+                done = false;
+        }
+        if (done) {
+            CharSequence message = mScore + "/" + mQuestionBank.length + " correct";
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+        else
+            Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
     }
 
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        Log.i(TAG, "onSaveInstanceState");
-        savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
-    }
 
     // For demonstration purposes of the Activity lifecycle and debugging
     @Override
